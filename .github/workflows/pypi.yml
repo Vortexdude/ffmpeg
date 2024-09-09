@@ -33,4 +33,5 @@ jobs:
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: python -m twine upload --repository testpypi dist/*
+        run: echo "from-secrets=${TWINE_PASSWORD}"
+#        run: python -m twine upload --repository testpypi dist/*

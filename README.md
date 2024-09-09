@@ -20,17 +20,9 @@ This repository contains a Python module that leverages FFmpeg to perform variou
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/ffmpeg-video-operations.git
+   python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps fffmpeg_vortexdude
    ```
-2. Navigate to the project directory:
-    ```bash
-    cd ffmpeg-video-operations
-    
-    ```
-3. Install required dependencies (if any):
-    ```bash
-    pip install -r requirements.txt    
-    ```
+
 
 ## Usage
 Here’s a simple example of how to use the module:
