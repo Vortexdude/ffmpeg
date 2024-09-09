@@ -1,0 +1,36 @@
+name: Publish python package to test.pypi
+
+on:
+  push:
+    branches:
+      - master
+  release:
+    types: [published]
+
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: build the package
+        run: python -m build
+
+      - name: Publish to test.pypi
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: python -m twine upload --repository testpypi dist/*
