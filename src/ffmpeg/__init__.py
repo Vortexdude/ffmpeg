@@ -1,3 +1,3 @@
-from ffmpeg.main import FFMPEG
+from .ffmpeg import FFMPEG
 
 __all__ = ["FFMPEG"]

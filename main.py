@@ -1,21 +1,20 @@
-# from ffmpeg import FFMPEG
+from ffmpeg import FFMPEG
 
+file = "dms.mkv"
 
-if __name__ == "__main__":
-    INPUT_FILE = "dms.mkv"
+ss = FFMPEG(file_path=file)
 
-    # Create a video processor instance and process the video
-    # video_processor = FFMPEG(input_file=INPUT_FILE)
-    # video_processor.width = 720
-    # video_processor.height = 1080
-    # video_processor.scale()
-    # chapters = video_processor.chapters
-    # video_processor.split_chapter(chapters)
-    # video_processor.remove_audio()
-    # video_processor.take_screenshot()
-    # video_processor.extrac_audio()
-    # for stream in audio_streams:
-    #     if stream['tags']['language'] == 'eng':
-    #         video_processor.extrac_audio(stream)
-    # video_processor.reverse_video()
-    
+# chapters = ss.metadata.get('chapters')
+# print(chapters)
+# ss.split(chapters)
+# ss.remove_audio()
+# ss.take_screenshot()
+# audio_stream = ss.audio_streams
+# video_stream = ss.video_streams
+# print(audio_stream)
+# for stream in audio_stream:
+#     if stream['name'] == "hin":
+#         ss.extrac_audio(stream)
+
+# ss.reverse_video(include_audio=False)
+ss.scale("480x240")
