@@ -1,6 +1,6 @@
 [project]
 name = "ffmpeg_vortexdude"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   { name="Nitin Namdev", email="nitin.namdev@outlook.com" },
 ]
