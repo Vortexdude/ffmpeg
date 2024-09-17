@@ -38,15 +38,15 @@ To use this module, make sure you have Python 3.12 and FFmpeg installed.
    
    file = "sample.mp4"
    ss = FFMPEG(input_stream=file)
+   chapters = ss.metadata.get('chapters')
+   ss.split(chapters)
    ```
 3. Remove Audio from Video <br> Remove audio tracks from a video file:
 
    ``` python
    ss.remove_audio()
-   4. Take a Screenshot
    ```
-
-4. Capture a screenshot at a specific time in the video:
+4. Take a screenshot <br> Capture a screenshot at a specific time in the video:
 
    ``` python
    ss.take_screenshot(time="00:00:05")
