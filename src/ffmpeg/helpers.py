@@ -2,7 +2,7 @@ import os
 import subprocess as sp
 from .config import logger
 from functools import wraps
-from .exceptions import errors
+from ffmpeg.exceptions import errors
 from typing import Any, List, Dict
 import string
 import random

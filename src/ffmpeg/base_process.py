@@ -1,7 +1,7 @@
 from .config import logger
 from .helpers import runner, id_generator
 from .builder import CMDJoiner
-from .exceptions import errors
+from ffmpeg.exceptions import errors
 
 
 class BaseProcess:

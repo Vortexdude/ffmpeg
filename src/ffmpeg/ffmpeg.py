@@ -1,6 +1,6 @@
 from .metadata import Metadata
 from .chapter import ChapterMixing
-from .video import VideoProcess
+from ffmpeg.video.filters import VideoProcess
 from .base_process import BaseProcess
 from abc import ABC, abstractmethod
 
