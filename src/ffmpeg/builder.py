@@ -1,5 +1,5 @@
 from .config import logger
-from .exceptions import errors
+from ffmpeg.exceptions import errors
 
 __all__ = ["CMDJoiner"]
 

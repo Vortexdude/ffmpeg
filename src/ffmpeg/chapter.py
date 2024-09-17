@@ -2,7 +2,7 @@ import os
 from .config import Config
 from .helpers import runner, FFMpegHelper
 from .handlers import FileHandler, BaseFFMPEG
-from .exceptions import errors
+from ffmpeg.exceptions import errors
 from .config import logger
 from .builder import CMDJoiner
 
