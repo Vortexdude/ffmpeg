@@ -3,12 +3,12 @@
 This repository contains a Python module that leverages FFmpeg to perform various video media operations. The module is written in Python 3.12 and provides an easy-to-use interface for handling video files, extracting audio, taking screenshots, and more.
 
 ## Features
-
-- **Split Video into Chapters**: Automatically splits a video file into chapters based on embedded metadata.
-- **Remove Audio**: Strips the audio track from a video file.
-- **Take Screenshots**: Captures screenshots from specific frames in the video.
-- **Extract Audio**: Extracts audio tracks from a video file.
-- **Stream Selection**: Allows selection of audio, video, or subtitle streams for further processing.
+- **Splitting Chapters**: Split video by chapters metadata.
+- **Take Screenshot**: Capture a screenshot at a specific timestamp.
+- **Stream to MP4 Conversion**: Convert streaming files (e.g., .m3u8) to MP4.
+- **View Metadata**: Access video and audio metadata, including chapters and streams.
+- **Remove Audio from Video**: Remove audio tracks from the video file.
+- **Convert Video to Audio**: Extract audio streams from a video and convert them to audio-only formats.
 
 ## Requirements
 
@@ -16,8 +16,7 @@ This repository contains a Python module that leverages FFmpeg to perform variou
 - FFmpeg installed and accessible via the command line
 
 ## Installation
-
-1. Clone the repository:
+To use this module, make sure you have Python 3.12 and FFmpeg installed.
 
    ```bash
    python3 -m pip install --index-url https://test.pypi.org/simple/ --no-deps fffmpeg_vortexdude
@@ -25,43 +24,64 @@ This repository contains a Python module that leverages FFmpeg to perform variou
 
 
 ## Usage
-Here’s a simple example of how to use the module:
-```python
-from ffmpeg import FFMPEG
+1. Initialize an FFMPEG Object
+   ``` python
+   from ffmpeg import FFMPEG
+   
+   file = "sample.mp4"
+   ss = FFMPEG(input_stream=file)
+   ```
 
-if __name__ == "__main__":
-    INPUT_FILE = "dms.mkv"
+2. Splitting Chapters <br> If the video contains chapters metadata, you can split the video into separate files for each chapter.
+   ``` python
+   from ffmpeg import FFMPEG
+   
+   file = "sample.mp4"
+   ss = FFMPEG(input_stream=file)
+   ```
+3. Remove Audio from Video <br> Remove audio tracks from a video file:
 
-    # Create a video processor instance and process the video
-    video_processor = FFMPEG(input_file=INPUT_FILE)
-    
-    # Get chapters from the video
-    chapters = video_processor.chapters
-    
-    # Split the video into chapters
-    video_processor.split_chapter(chapters)
-    
-    # Remove the audio track from the video
-    video_processor.remove_audio()
-    
-    # Take a screenshot from the video
-    video_processor.take_screenshot()
-    
-    # Extract the audio track from the video
-    video_processor.extract_audio()
-    
-    # Get the list of audio streams
-    audio_streams = video_processor.streams(stream_selector='audio')
-    
-    # Get the list of video streams
-    video_streams = video_processor.streams(stream_selector='video')
-    
-    # Get the list of subtitle streams
-    subtitles = video_processor.streams(stream_selector='subtitle')
-    
-    # Example: Extract the English audio track
-    for stream in audio_streams:
-        if stream['tags'] == 'eng':
-            video_processor.extract_audio()
+   ``` python
+   ss.remove_audio()
+   4. Take a Screenshot
+   ```
 
-```
+4. Capture a screenshot at a specific time in the video:
+
+   ``` python
+   ss.take_screenshot(time="00:00:05")
+   ```
+5. Convert Streaming Video to MP4 <br> You can convert a stream URL (e.g., .m3u8) to MP4:
+
+    ``` python
+    file = "https://v1.pinimg.com/videos/iht/hls/af/e6/a0/afe6a04e775f492fbb58b6fbf7e21eef.m3u8"
+    ss = FFMPEG(input_stream=file)
+    ss.convert_to_mp4(output="output.mp4")
+    ```
+
+6. Extract Audio Streams <br> Extract audio streams from a video:
+
+    ``` python
+    audio_stream = ss.audio_streams
+    for stream in audio_stream:
+        if stream['name'] == "hin":  # Example: Hindi audio track
+            ss.extract_audio(stream)
+    ```
+
+7. Reverse Video <br> Reverse the video with or without audio:
+
+    ``` python
+    ss.reverse_video(include_audio=False)
+    ```
+
+8. Convert to GIF <br> Convert a portion of the video to a GIF:
+
+    ``` python
+    ss.convert_to_gif(start_time="00:00:10", duration=5)
+    ```
+
+9. Resize/Scale Video <br> Resize the video to specific dimensions:
+
+    ``` python
+    ss.scale("480x240")
+    ```
