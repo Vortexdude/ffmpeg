@@ -22,6 +22,11 @@ class BaseClass:
 
 class Constant(BaseClass):
 
+
+    def FORCEFULLY(self):
+        self.cmd.append("-y")
+        return self
+
     @property
     def DISPLAY_STREAM(self):
         self.cmd.append("-show_streams")
@@ -154,5 +159,5 @@ class CMDJoiner(Constant, Codecs, Filters):
 
     def build(self):
         """finalizing the command"""
-        logger.info(f"Running the command '{' '.join(self.cmd)}'")
+        logger.debug(f"Running the command '{' '.join(self.cmd)}'")
         return self._cmd

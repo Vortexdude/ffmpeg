@@ -1,24 +1,18 @@
-import logging
+from .logging import GuardianLogger
+
 
 class Config:
     output_dir: str = "outputs"
     supported_filters: list = ['reverse']
     log_level: str = 'info'
 
+    @classmethod
+    def set_log_level(cls, value):
+        cls.log_level = value
 
-logger_mapping = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warn": logging.WARNING,
-    "error": logging.ERROR,
-    "fatal": logging.FATAL
-}
 
-logger = logging.getLogger("ffmpeg")
+setting = Config()
 
-logging.basicConfig(
-    format="[{levelname}] - {asctime} - {message}",
-    style="{",
-    datefmt="%Y-%m-%d %H:%M",
-    level=logger_mapping[Config.log_level]
-    )
+log_init = GuardianLogger('info', "FFMPEG")
+logger = log_init.get_logger()
+logger.debug("Logging Initialize ... .. .")
