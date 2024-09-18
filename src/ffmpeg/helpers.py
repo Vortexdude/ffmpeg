@@ -1,36 +1,45 @@
 import os
+import random
+import string
 import subprocess as sp
 from .config import logger
 from functools import wraps
-from ffmpeg.exceptions import errors
 from typing import Any, List, Dict
-import string
-import random
-from .exceptions.errors import InvalidTypeError
+from ffmpeg.exceptions import errors
 
+def runner(force=False):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            force_replace = kwargs.get('force_replace', False) or force
 
-def runner(func):
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):
-        if "ffmpeg" not in self.cmd or "ffprobe" in self.cmd:
-            logger.error("Invalid Command")
-            raise errors.InvalidCommand
+            if force_replace:
+                logger.info("force is enable")
 
-        func(self, *args, **kwargs)
+            if "ffmpeg" not in self.cmd or "ffprobe" in self.cmd:
+                logger.error("Invalid Command")
+                raise errors.InvalidCommand
 
-        if 'ffprobe' in self.cmd or func.__name__ == "_get_metadata":
-            _metadata = sp.run(self.cmd, stdout=sp.PIPE, stderr=sp.STDOUT, shell=False)
-            return _metadata.stdout.decode('utf-8')
+            func(self, *args, **kwargs)
 
-        output_file = self.cmd[-1]
+            if 'ffprobe' in self.cmd or func.__name__ == "_get_metadata":
+                _metadata = sp.run(self.cmd, stdout=sp.PIPE, stderr=sp.STDOUT, shell=False)
+                return _metadata.stdout.decode('utf-8')
 
-        if os.path.exists(output_file):
-            logger.error(f"File '{output_file}' already exists you can overwrite the file by args.")
-            raise errors.FileAlreadyExists(file=output_file)
+            output_file = self.cmd[-1]
 
-        output = sp.run(self.cmd, stdout=sp.PIPE, stderr=sp.STDOUT, shell=False)
-        self._reset()
-    return wrapper
+            if os.path.exists(output_file):
+                if not force_replace:
+                    logger.error(f"File '{output_file}' already exists you can overwrite the file by args.")
+                    raise errors.FileAlreadyExists(file=output_file)
+                else:
+                    logger.warning("File already exists overwriting the file")
+
+            output = sp.run(self.cmd, stdout=sp.PIPE, stderr=sp.STDOUT, shell=False)
+            self._reset()
+
+        return wrapper
+    return decorator
 
 
 class FFMpegHelper:

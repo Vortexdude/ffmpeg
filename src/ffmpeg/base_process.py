@@ -1,3 +1,4 @@
+import re
 from .config import logger
 from .helpers import runner, id_generator
 from .builder import CMDJoiner
@@ -31,7 +32,17 @@ class BaseProcess:
         self.download(output_file)
         return output_file  # set the input for other filter
 
-    @runner
+    @runner(force=False)
     def download(self, output_file=None):
         joiner = CMDJoiner(['ffmpeg']).INPUT(self.url).codec('copy').audio_bitstream("aac_adtstoasc")
         self.cmd = joiner.OUTPUT_FILE(output_file).build()
+
+
+def parser(file) -> str:
+    _url_pattern = r'https:\/\/[^\s]+?\.(mp3|mp4|m3u8|flv|mkv|jpg|png|jpeg)'
+    matches = re.findall(_url_pattern, file)
+    for match in matches:
+        if match == 'm3u8':
+            logger.info("Extracting HLS stream file.")
+            return BaseProcess(file).run()
+    return file

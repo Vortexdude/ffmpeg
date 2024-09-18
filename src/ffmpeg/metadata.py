@@ -11,7 +11,7 @@ class Metadata(BaseFFMPEG):
         self.audio_streams = FFMpegHelper.format_stream(streams=self.metadata.get('streams'), _type='audio')
         self.video_streams = FFMpegHelper.format_stream(streams=self.metadata.get('streams'), _type='video')
 
-    @runner
+    @runner(force=False)
     def _get_metadata(self) -> run:
         cmd_builder = CMDJoiner(cmd=["ffprobe"]).log_level("quiet").INPUT(self.file_path).print_format("json").DISPLAY_STREAM.DISPLAY_CHAPTERS
         self.cmd = cmd_builder.build()

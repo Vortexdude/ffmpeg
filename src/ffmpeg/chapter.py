@@ -22,7 +22,7 @@ class ChapterMixing(BaseFFMPEG):
 
             self.split_chapter(chapter, force_recreation_chapter=force_recreation_chapter)
 
-    @runner
+    @runner(force=False)
     def split_chapter(self, chapter: dict, force_recreation_chapter=False):
         logger.info(f"Splitting chapter {chapter['id']}")
         output_file = FFMpegHelper.generate_chapter_filename(input_file=self.file_path, chapter=chapter)
