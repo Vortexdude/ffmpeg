@@ -4,6 +4,7 @@ class BaseExc(Exception):
     def __init__(self):
         super().__init__(self.MESSAGE)
 
+
 class ChapterAlreadyExistsException(BaseExc):
     MESSAGE = "Chapter already already Exists"
 
@@ -19,6 +20,7 @@ class NoChapterFound(BaseExc):
 class NoStreamFound(BaseExc):
     MESSAGE = "No Stream found in the video file"
 
+
 class InvalidCommand(BaseExc):
     MESSAGE = "Error with the command"
 
@@ -32,7 +34,7 @@ class URLStreamError(BaseExc):
 
 
 class InvalidOptionError(ValueError):
-    def __init__(self, options: str, optional_values = None):
+    def __init__(self, options: str, optional_values=None):
         message = f"The option '{options}' is invalid. "
         if optional_values:
             message += f"only possible values are {optional_values}"
@@ -49,8 +51,10 @@ class FileAlreadyExists(FileExistsError):
 
 class InvalidTypeError(ValueError):
     message: str = f"Option type Error"
+
     def __init__(self, arg):
         super().__init__(self.message)
+
 
 class FileNotFound(FileNotFoundError):
 

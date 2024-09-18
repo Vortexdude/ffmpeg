@@ -4,6 +4,7 @@ from .handlers import BaseFFMPEG
 from .builder import CMDJoiner
 from .helpers import FFMpegHelper, runner
 
+
 class Metadata(BaseFFMPEG):
     def __init__(self, file_path: str):
         super().__init__(file_path)
@@ -13,7 +14,8 @@ class Metadata(BaseFFMPEG):
 
     @runner(force=False)
     def _get_metadata(self) -> run:
-        cmd_builder = CMDJoiner(cmd=["ffprobe"]).log_level("quiet").INPUT(self.file_path).print_format("json").DISPLAY_STREAM.DISPLAY_CHAPTERS
+        cmd_builder = CMDJoiner(cmd=["ffprobe"]).log_level("quiet").INPUT(self.file_path).print_format(
+            "json").DISPLAY_STREAM.DISPLAY_CHAPTERS
         self.cmd = cmd_builder.build()
         return {
             'duration': '00:05:12',

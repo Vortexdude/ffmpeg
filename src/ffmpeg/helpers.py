@@ -7,6 +7,7 @@ from functools import wraps
 from typing import Any, List, Dict
 from ffmpeg.exceptions import errors
 
+
 def runner(force=False):
     def decorator(func):
         @wraps(func)
@@ -39,6 +40,7 @@ def runner(force=False):
             self._reset()
 
         return wrapper
+
     return decorator
 
 
@@ -49,7 +51,8 @@ class FFMpegHelper:
         """Formats the list of streams based on the type (audio, video, etc.).
 
         """
-        def extract_tag(tag: dict[str, str], key: str, default: str='N/A'):
+
+        def extract_tag(tag: dict[str, str], key: str, default: str = 'N/A'):
             return tag.get(key, default)
 
         _streams = []

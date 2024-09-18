@@ -1,7 +1,7 @@
 from ..config import logger
-from ..helpers import runner, arg_eval
-from ..handlers import BaseFFMPEG
 from ..builder import CMDJoiner
+from ..handlers import BaseFFMPEG
+from ..helpers import runner, arg_eval
 
 
 class VideoProcess(BaseFFMPEG):

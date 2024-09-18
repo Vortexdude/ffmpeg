@@ -1,8 +1,8 @@
 import re
 from .config import logger
-from .helpers import runner, id_generator
 from .builder import CMDJoiner
 from ffmpeg.exceptions import errors
+from .helpers import runner, id_generator
 
 
 class BaseProcess:

@@ -1,6 +1,7 @@
 import os
 from .base import FileHandlerABS
 
+
 class BaseFFMPEG:
     def __init__(self, file_path: str):
         self.cmd = ['ffmpeg']
