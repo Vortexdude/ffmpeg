@@ -39,6 +39,14 @@ class BaseProcess:
 
 
 def parser(file) -> str:
+    """
+    Download the file depending upon the extension of the file
+    later add the logic for autosave 
+    :param file:
+    :type file:
+    :return:
+    :rtype:
+    """
     _url_pattern = r'https:\/\/[^\s]+?\.(mp3|mp4|m3u8|flv|mkv|jpg|png|jpeg)'
     matches = re.findall(_url_pattern, file)
     for match in matches:

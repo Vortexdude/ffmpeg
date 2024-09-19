@@ -1,11 +1,25 @@
+import re
 import os
+import time
 import random
 import string
+import datetime
 import subprocess as sp
 from .config import logger
 from functools import wraps
-from typing import Any, List, Dict
+from typing import Any, List, Dict, TypeAlias, NewType
 from ffmpeg.exceptions import errors
+
+TimeRange: TypeAlias = tuple[int | float, int | float]
+
+TimeString = NewType('TimeString', str)
+
+def validate_time_string(time_str: str)-> TimeString:
+    pattern = r"^\d{2}:\d{2}:\d{2}$"  # regex for HH:MM:SS pattern
+    if re.match(pattern, time_str):
+        return TimeString(time_str)
+    else:
+         raise ValueError(f"Invalid time string format: {time_str}. Expected 'HH:MM:SS'")
 
 
 def runner(force=False):
@@ -36,7 +50,7 @@ def runner(force=False):
                 else:
                     logger.warning("File already exists overwriting the file")
 
-            output = sp.run(self.cmd, stdout=sp.PIPE, stderr=sp.STDOUT, shell=False)
+            sp.run(self.cmd, stdout=sp.PIPE, stderr=sp.STDOUT, shell=False)
             self._reset()
 
         return wrapper
@@ -61,7 +75,7 @@ class FFMpegHelper:
             if stream.get('codec_type') == _type:
                 _data = {
                     'index': stream.get('index', "N/A"),
-                    'duration': extract_tag(stream.get('tags', {}), "DURATION", "UNKNOWN"),
+                    'duration': stream.get('duration', "UNKNOWN"),
                 }
 
                 if _type == 'audio':
@@ -91,35 +105,100 @@ class FFMpegHelper:
         title = chapter['tags']['title'].replace(" ", "_")
         return f"{file}_{start_time}-{end_time}_{title}{extension}"
 
+    @staticmethod
+    def dimension_arg_eval(arg: str) -> tuple[str, str] | None:
+        """
+        Evaluate the width and height from arg string as per the given format
+        1. w=200:h=100
+        2. 200:100
+        3. 200x100 or 200X100
+        :param arg:
+        :type arg:
+        :return:
+        :rtype:
+        """
+        width = None
+        height = None
 
-def arg_eval(arg: str) -> tuple[str, str] | None:
-    """
-    Evaluate the width and height from arg string as per the given format
-    1. w=200:h=100
-    2. 200:100
-    3. 200x100 or 200X100
-    :param arg:
-    :type arg:
-    :return:
-    :rtype:
-    """
-    width = None
-    height = None
+        if "x" in arg.lower():
+            width, height = arg.lower().split("x")
 
-    if "x" in arg.lower():
-        width, height = arg.lower().split("x")
+        if ":" in arg:
+            _w, _h = arg.split(":")
+            if "w" in _w.lower() and "h" in _h.lower():
+                if "=" in _w.lower() and "=" in _h.lower():
+                    width = _w.split("=")[1]
+                    height = _h.split("=")[1]
+            else:
+                width, height = _w, _h
 
-    if ":" in arg:
-        _w, _h = arg.split(":")
-        if "w" in _w.lower() and "h" in _h.lower():
-            if "=" in _w.lower() and "=" in _h.lower():
-                width = _w.split("=")[1]
-                height = _h.split("=")[1]
-        else:
-            width, height = _w, _h
-
-    return width, height
+        return width, height
 
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits) -> str:
     return "".join(random.choice(chars) for _ in range(size))
+
+
+class TConverter:
+    FORMAT: str = "%H:%M:%S"
+
+    @classmethod
+    def to_string(cls, seconds: int | float) -> str:
+        """
+        Converts seconds into formatted string with hour:minutes:seconds
+        :param seconds:
+        :type seconds:
+        :return:
+        :rtype:
+        """
+        return time.strftime(cls.FORMAT, time.gmtime(seconds))
+
+    @classmethod
+    def to_seconds(cls, data: str) -> int | float:
+        """
+        Covert the string into total seconds like 00:10:00 into 600 seconds
+        :param data:
+        :type data:
+        :return:
+        :rtype:
+        """
+        x = time.strptime(data, cls.FORMAT)
+        return datetime.timedelta(hours=x.tm_hour, minutes=x.tm_min, seconds=x.tm_sec).total_seconds()
+
+
+def validate_time_range(video_duration: str,
+                        seek: TimeString = None,
+                        end: TimeString = None,
+                        max_length: int = 10) -> TimeRange:
+
+    video_runtime = TConverter.to_seconds(validate_time_string(video_duration))
+    if seek is None and end is None:
+        _seek = 3.0
+        _end = float(_seek + max_length)
+    else:
+        if seek is None:
+            _end = TConverter.to_seconds(validate_time_string(end))
+            _seek = max(_end - max_length, 0)
+
+        elif end is None:
+            _seek = TConverter.to_seconds(validate_time_string(seek))
+            _end = _seek + max_length
+
+        else:
+            _seek = TConverter.to_seconds(validate_time_string(seek))
+            _end = TConverter.to_seconds(validate_time_string(end))
+
+    if _seek > video_runtime and _end > video_runtime:
+        logger.warning("Seek and end time are beyond the video length.")
+        _seek = max(video_runtime - max_length, 0)
+        _end = video_runtime
+
+    elif _seek > video_runtime:
+        logger.warning("Seek is greater than the length of the video")
+        _seek = max(video_runtime - max_length, 0)
+
+    elif _end > video_runtime:
+        logger.warning("End is greater than the length of the video")
+        _end = video_runtime
+
+    return _seek, _end

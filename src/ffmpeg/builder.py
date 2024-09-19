@@ -1,4 +1,5 @@
 from .config import logger
+from .constant import Flags
 from ffmpeg.exceptions import errors
 
 __all__ = ["CMDJoiner"]
@@ -29,12 +30,17 @@ class Constant(BaseClass):
 
     @property
     def DISPLAY_STREAM(self):
-        self.cmd.append("-show_streams")
+        self.cmd.append(Flags.STREAM)
+        return self
+
+    @property
+    def DISPLAY_FORMAT(self):
+        self.cmd.append(Flags.FORMAT)
         return self
 
     @property
     def DISPLAY_CHAPTERS(self):
-        self.cmd.append("-show_chapters")
+        self.cmd.append(Flags.CHAPTERS)
         return self
 
     @property

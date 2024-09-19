@@ -1,7 +1,7 @@
 from ..config import logger
 from ..builder import CMDJoiner
 from ..handlers import BaseFFMPEG
-from ..helpers import runner, arg_eval
+from ..helpers import runner, FFMpegHelper
 
 
 class VideoProcess(BaseFFMPEG):
@@ -77,7 +77,7 @@ class VideoProcess(BaseFFMPEG):
 
         _filter = "scale="
         if arg:
-            _w, _h = arg_eval(arg)
+            _w, _h = FFMpegHelper.dimension_arg_eval(arg)
             if _w and _h:
                 width = _w
                 height = _h
