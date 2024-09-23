@@ -1,10 +1,14 @@
+import os
 from .config import logger
 from .constant import Flags
 from ffmpeg.exceptions import errors
+from .helpers import FilterUtils
 
 __all__ = ["CMDJoiner"]
 
 SUPPORTED_FILTERS = ['reverse', "scale"]
+VIDEO_EXTENSIONS = ['.webm', '.mkv', '.flv', '.ogv', '.mov', '.avi', '.mp4', '.m4v', '.mpg', '.mpeg', '.m4v', '.3gp']
+IMAGE_EXTENSIONS = ['.jpg', '.jpeg', ".png", "webm", ".gif", ".svg", "webp"]
 
 
 class BaseClass:
@@ -22,7 +26,6 @@ class BaseClass:
 
 
 class Constant(BaseClass):
-
 
     def FORCEFULLY(self):
         self.cmd.append("-y")
@@ -82,7 +85,6 @@ class Filters(BaseClass):
             self.cmd.extend(["-metadata", f"{key}={value}"])
         return self
 
-
     def video_filter(self, value):
         if value not in SUPPORTED_FILTERS:
             if 'scale' in value:
@@ -91,7 +93,7 @@ class Filters(BaseClass):
 
             raise NotImplementedError
 
-        self.cmd.extend(["-filter:v", value]) # or "-vf" is the same
+        self.cmd.extend(["-filter:v", value])  # or "-vf" is the same
         return self
 
     def audio_filter(self, value):
@@ -103,6 +105,28 @@ class Filters(BaseClass):
 
     def audio_bitstream(self, value):
         self.cmd.extend(["-bsf:a", value])
+        return self
+
+    def FILTER_COMPLEX(self, filter_type, scaling_factor, position):
+        combination: list = []
+        filters: list = []
+        if filter_type == 'watermark':
+            combination = ["scale2ref", "overlay"]
+
+        if self.cmd[1] not in self.cmd[2:]:  # check the -i or input appears multiple times
+            raise ValueError("For filter complex need to have multiple input files")
+
+        total_inputs = [self.cmd[inx + 1] for inx, item in enumerate(self.cmd) if item == "-i"]
+
+        if len(total_inputs) < 2:
+            raise ValueError("at least two input should be provided")
+
+        for _filter in combination:
+            _filter_string = FilterUtils.create_filter_string(total_inputs, scaling_factor,_filter, position)
+            if _filter_string:
+                filters.append(_filter_string)
+
+        self.cmd.extend(["-filter_complex", "%s" % (";".join(filters))])
         return self
 
 
@@ -165,7 +189,6 @@ class CMDJoiner(Constant, Codecs, Filters):
     def map(self, value):
         self.cmd.extend(["-map", str(value)])
         return self
-
 
     def threads(self, value):
         self.cmd.extend(["-threads", str(value)])

@@ -200,3 +200,92 @@ def validate_time_range(video_duration: str,
         _end = video_runtime
 
     return TConverter.to_string(_seek), TConverter.to_string(_end)
+
+
+class FilterUtils:
+    VIDEO_KEY: str = "video"
+    AUDIO_KEY: str = 'audio'
+    IMAGE_KEY: str = 'image'
+    VIDEO_EXTENSIONS = ['.webm', '.mkv', '.flv', '.mov', '.avi', '.mp4', '.mpeg', '.m4v', '.3gp']
+    IMAGE_EXTENSIONS = ['.jpg', '.jpeg', ".png", "webm", ".gif", ".svg", "webp"]
+
+
+    @staticmethod
+    def _wh_string_generator(scaling_factor: float = None):
+        _image_width = ""
+        _image_height = "oh*mdar"  # output_height X maintain the display aspect ratio
+        if scaling_factor:
+            _image_width = f"ih*{str(scaling_factor)}"  # input height x 0.2 or 20% of video's height
+
+        return f"{_image_height}:{_image_width}"
+
+    @classmethod
+    def _overlay_filter_string(cls, position: str, padding: int = None):
+        _width = ""
+        _height = ""
+        _available_positions = ['top_left', "top_right", "bottom_left", "bottom_right", "centre"]
+        if position not in _available_positions:
+            raise ValueError(f"Unsupported position for now : {_available_positions}")
+
+        _init_string = f"[{cls.VIDEO_KEY}][{cls.IMAGE_KEY}]overlay="
+        if position == "top_left":
+            _width = "0"
+            _height = "0"
+
+        elif position == 'top_right':
+            _width = "(main_w-overlay_w)"
+            _height = "0"
+
+        elif position == 'bottom_left':
+            _width = "0"
+            _height = "(main_h-overlay_h)"
+
+        elif position == 'bottom_right':
+            _width = "(main_w-overlay_w)"
+            _height = "(main_h-overlay_h)"
+
+        elif position == 'centre':
+            _width = "(main_w-overlay_w)/2"
+            _height = "(main_h-overlay_h)/2"
+
+        if padding:
+            if _width != "0":
+                _width = f"{_width}-{str(padding)}"
+            else:
+                _width = padding
+            if _height != "0":
+                _height = f"{_height}-{str(padding)}"
+            else:
+                _height = padding
+
+        return _init_string + f"{_width}:{_height}"
+
+
+    @classmethod
+    def create_filter_string(cls, total_inputs, scaling_factor, filter_name, position: str = 'top_left', padding=None):
+        key_mapping: dict = {}
+        for idx, _input in enumerate(total_inputs):
+            _extension = os.path.splitext(_input)[1]
+            if _extension in cls.VIDEO_EXTENSIONS:
+                key_mapping[cls.VIDEO_KEY] = idx
+
+            elif _extension in cls.IMAGE_EXTENSIONS:
+                key_mapping[cls.IMAGE_KEY] = idx
+
+            else:
+                key_mapping[f"input_{idx}"] = idx
+
+        video_key = key_mapping[cls.VIDEO_KEY]
+        image_key = key_mapping[cls.IMAGE_KEY]
+        wh_string = cls._wh_string_generator(scaling_factor)
+
+        if filter_name == "scale2ref":
+            return f"[{image_key}][{video_key}]scale2ref={wh_string}[{cls.IMAGE_KEY}][{cls.VIDEO_KEY}]"
+
+        elif filter_name == "overlay":
+            if padding is None:
+                padding = 30
+            return cls._overlay_filter_string(position=position, padding=padding)
+
+        else:
+            raise ValueError("Unsupported filter, Get some Help!")
