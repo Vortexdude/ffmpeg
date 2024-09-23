@@ -2,11 +2,14 @@ from ffmpeg import FFMPEG
 
 file = "sample.mp4"
 # file = "audio.mp3"
+# file = "audio_modified.mp3"
 # file = "tanjiro.jpeg"
 # file = "https://v1.pinimg.com/videos/mc/hls/8f/b1/d6/8fb1d693ed2890d1eb45fef1127f3fd0.m3u8"
 
 app = FFMPEG(input_stream=file)
-app.convert_to_gif(seek="00:02:16")
+# app.add_metadata(genre="hiphop", album="Encore", artist="Nitin")
+# print(app.metadata.get('format').get('tags'))
+# app.convert_to_gif(seek="00:00:10", force_replace=True)
 
 # print(app.metadata)
 
@@ -16,7 +19,7 @@ app.convert_to_gif(seek="00:02:16")
 #     app.split(chapters)
 #
 # app.remove_audio(force_replace=True)
-# app.take_screenshot(time="00:00:05", force_replace=True)
+app.take_screenshot(time="00:00:11")
 # audio_stream = app.audio_streams
 # video_stream = app.video_streams
 #

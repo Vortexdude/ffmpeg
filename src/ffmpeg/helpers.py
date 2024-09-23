@@ -10,7 +10,7 @@ from functools import wraps
 from typing import Any, List, Dict, TypeAlias, NewType
 from ffmpeg.exceptions import errors
 
-TimeRange: TypeAlias = tuple[int | float, int | float]
+TimeRange: TypeAlias = tuple[str, str]
 
 TimeString = NewType('TimeString', str)
 
@@ -27,9 +27,8 @@ def runner(force=False):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
             force_replace = kwargs.get('force_replace', False) or force
-
             if force_replace:
-                logger.info("force is enable")
+                logger.info("Force replace is enable.")
 
             if "ffmpeg" not in self.cmd or "ffprobe" in self.cmd:
                 logger.error("Invalid Command")
@@ -48,13 +47,12 @@ def runner(force=False):
                     logger.error(f"File '{output_file}' already exists you can overwrite the file by args.")
                     raise errors.FileAlreadyExists(file=output_file)
                 else:
-                    logger.warning("File already exists overwriting the file")
+                    logger.warning(f"File '{output_file}' already exists overwriting the file")
 
             sp.run(self.cmd, stdout=sp.PIPE, stderr=sp.STDOUT, shell=False)
             self._reset()
 
         return wrapper
-
     return decorator
 
 
@@ -201,4 +199,4 @@ def validate_time_range(video_duration: str,
         logger.warning("End is greater than the length of the video")
         _end = video_runtime
 
-    return _seek, _end
+    return TConverter.to_string(_seek), TConverter.to_string(_end)

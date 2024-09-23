@@ -75,6 +75,14 @@ class Filters(BaseClass):
         self.cmd.extend(['-vf', filter_string])
         return self
 
+    # https://superuser.com/questions/1331752/ffmpeg-adding-metadata-to-an-mp3-from-mp3-input
+
+    def metadata(self, **kwargs):
+        for key, value in kwargs.items():
+            self.cmd.extend(["-metadata", f"{key}={value}"])
+        return self
+
+
     def video_filter(self, value):
         if value not in SUPPORTED_FILTERS:
             if 'scale' in value:
