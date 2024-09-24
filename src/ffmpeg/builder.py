@@ -1,8 +1,7 @@
-import os
 from .config import logger
 from .constant import Flags
 from ffmpeg.exceptions import errors
-from .helpers import FilterUtils
+from .helpers import FilterUtils, FFMPegFilterBuilder
 
 __all__ = ["CMDJoiner"]
 
@@ -108,23 +107,39 @@ class Filters(BaseClass):
         return self
 
     def FILTER_COMPLEX(self, filter_type, scaling_factor, position):
+
         combination: list = []
         filters: list = []
         if filter_type == 'watermark':
-            combination = ["scale2ref", "overlay"]
+            combination = ["format", "scale2ref", "overlay"]
 
         if self.cmd[1] not in self.cmd[2:]:  # check the -i or input appears multiple times
             raise ValueError("For filter complex need to have multiple input files")
 
         total_inputs = [self.cmd[inx + 1] for inx, item in enumerate(self.cmd) if item == "-i"]
 
+        cmds = []
+        for _filter in combination:
+            fObj = FFMPegFilterBuilder()
+            if _filter == "format":
+                fObj.add_input(1).format_filter().color_channel_mixer().link_stream('logo')
+                cmds.append(fObj.build())
+                fObj.reset()
+
+            if _filter == "scale2ref":
+                fObj.add_input('logo').add_input("0").scale2ref().link_stream('logo').link_stream("video")
+                cmds.append(fObj.build())
+                fObj.reset()
+
+            if _filter == 'overlay':
+                fObj.add_input('video').add_input("logo").overlay()
+                cmds.append(fObj.build())
+                fObj.reset()
+
+
+        print(";".join(cmds))
         if len(total_inputs) < 2:
             raise ValueError("at least two input should be provided")
-
-        for _filter in combination:
-            _filter_string = FilterUtils.create_filter_string(total_inputs, scaling_factor,_filter, position)
-            if _filter_string:
-                filters.append(_filter_string)
 
         self.cmd.extend(["-filter_complex", "%s" % (";".join(filters))])
         return self

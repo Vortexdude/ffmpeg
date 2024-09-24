@@ -1,9 +1,7 @@
-from pickle import FALSE
-
-from ..config import logger, Config
+from ..config import logger
 from ..builder import CMDJoiner
 from ..handlers import BaseFFMPEG
-from ..helpers import runner, FFMpegHelper, validate_time_range, TConverter, validate_time_string
+from ..helpers import runner
 
 
 class VideoProcess(BaseFFMPEG):
@@ -77,10 +75,9 @@ class VideoProcess(BaseFFMPEG):
         _sequence.add_filter(filter_string).video_codec('gif').OUTPUT_FILE(output_file)
         self.cmd = _sequence.build()
 
-    @runner(force=False)
+    # @runner(force=False)
     def add_watermark(self, watermark_file, position, scale_factor=None, output_file=None, force_replace: bool = False):
         filter_name = 'watermark'
-        padding = 10
         if scale_factor is None:
             scale_factor = 0.2
 
@@ -94,4 +91,4 @@ class VideoProcess(BaseFFMPEG):
 
         _sequence.INPUT(self.file_path).INPUT(watermark_file).FILTER_COMPLEX(filter_name, scale_factor, position).OUTPUT_FILE(output_file)
         self.cmd = _sequence.build()
-        print(self.cmd)
+        print(f"{self.cmd}")
