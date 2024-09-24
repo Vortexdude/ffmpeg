@@ -2,7 +2,7 @@ from ..config import logger
 from ..builder import CMDJoiner
 from ..handlers import BaseFFMPEG
 from ..helpers import runner
-
+from . import watermark
 
 class VideoProcess(BaseFFMPEG):
 
@@ -75,20 +75,20 @@ class VideoProcess(BaseFFMPEG):
         _sequence.add_filter(filter_string).video_codec('gif').OUTPUT_FILE(output_file)
         self.cmd = _sequence.build()
 
-    # @runner(force=False)
-    def add_watermark(self, watermark_file, position, scale_factor=None, output_file=None, force_replace: bool = False):
-        filter_name = 'watermark'
-        if scale_factor is None:
-            scale_factor = 0.2
-
-        if output_file is None:
-            output_file = f"{self.file_name}_mixed_{self.file_extension}"
-
+    @runner(force=False)
+    def add_watermark(self, watermark_file, *, position, padding, scale_factor, output_file, transparency, force_replace=None):
+        logger.info(f"Adding the file '{watermark_file}' in the video file '{self.file_path}' at '{position}' with transparency of {transparency}.")
         _sequence = CMDJoiner(["ffmpeg"])
 
         if force_replace:
             _sequence.FORCEFULLY()
 
-        _sequence.INPUT(self.file_path).INPUT(watermark_file).FILTER_COMPLEX(filter_name, scale_factor, position).OUTPUT_FILE(output_file)
+        filter_string = watermark.generate_filter_string(
+            scale_factor=scale_factor,
+            position=position,
+            padding=padding,
+            transparency=transparency
+        )
+
+        _sequence.INPUT(self.file_path).INPUT(watermark_file).FILTER_COMPLEX(filter_string).OUTPUT_FILE(output_file)
         self.cmd = _sequence.build()
-        print(f"{self.cmd}")

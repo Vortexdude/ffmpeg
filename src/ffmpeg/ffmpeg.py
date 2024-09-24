@@ -286,3 +286,71 @@ class FFMPEG(Metadata, ChapterMixing, VideoProcess, AudioProcessing):
         _filter = {'fps': str(fps), 'scale': f'{str(width)}:-1:flags=lanczos'}
 
         super().convert_to_gif(seek=seek, end=end, filter_string=_filter, output_file=output_file, force_replace=force_replace)
+
+    def add_watermark(self,
+                      watermark_file, *,
+                      position=None,
+                      padding=None,
+                      scale_factor=None,
+                      output_file=None,
+                      force_replace=False,
+                      transparency=None):
+        """
+        Adds a watermark to the video with options for position, scaling, transparency, and padding.
+
+        Parameters:
+        -----------
+        watermark_file : str
+            Path to the watermark image file (e.g., a PNG with transparency).
+
+        position : tuple, optional
+            Tuple specifying the x and y position of the watermark on the video (e.g., ('top-right', 'bottom-left')).
+            If None, the default position is the top-left corner of the video.
+
+        padding : int or tuple, optional
+            Padding around the watermark. Can be a single integer for uniform padding or a tuple for (horizontal, vertical) padding.
+            Default is None (no padding).
+
+        scale_factor : float, optional
+            Factor to scale the watermark relative to its original size. A value less than 1 will reduce the size, and greater than 1 will increase it.
+            Default is None (original size is used).
+
+        output_file : str, optional
+            Path to the output video file. If None, a default output file will be generated based on the input filename.
+
+        force_replace : bool, optional
+            If True, overwrite the existing output file if it exists. If False, an error will be raised if the output file already exists.
+            Default is False.
+
+        transparency : float, optional
+            The transparency level for the watermark (between 0 and 1). A value of 0 means fully transparent (invisible), and 1 means fully opaque.
+            Default is None (no transparency adjustment is made).
+
+        :param watermark_file:
+        :type watermark_file:
+        :param position:
+        :type position:
+        :param padding:
+        :type padding:
+        :param scale_factor:
+        :type scale_factor:
+        :param output_file:
+        :type output_file:
+        :param force_replace:
+        :type force_replace:
+        :param transparency:
+        :type transparency:
+        :return:
+        :rtype:
+        """
+        # setting default args
+        kwargs = {
+            'position': position or 'top_left',
+            'padding': padding or 30,
+            'scale_factor': scale_factor or 0.2,
+            'transparency': transparency or 0.3
+        }
+        if output_file is None:
+            output_file = f"{self.file_name}_mixed_{self.file_extension}"
+
+        super().add_watermark(watermark_file, output_file=output_file, force_replace=force_replace, **kwargs)

@@ -49,7 +49,8 @@ def runner(force=False):
                 else:
                     logger.warning(f"File '{output_file}' already exists overwriting the file")
 
-            sp.run(self.cmd, stdout=sp.PIPE, stderr=sp.STDOUT, shell=False)
+            output = sp.run(self.cmd, stdout=sp.PIPE, stderr=sp.STDOUT, shell=False)
+            # print(output.stdout.decode('utf-8'))
             self._reset()
 
         return wrapper
@@ -289,48 +290,3 @@ class FilterUtils:
 
         else:
             raise ValueError("Unsupported filter, Get some Help!")
-
-
-
-class FFMPegFilterBuilder:
-    def __init__(self):
-        self.commands = []
-        self.sub_filters = []
-
-    def add_input(self, value):
-        self.commands.append(f"[{value}]")
-        return self
-
-    def format_filter(self, format_type='rgba'):
-        self.sub_filters.append(f"format={format_type}")
-        return self
-
-    def scale2ref(self, width="oh*mdar", height="ih"):
-        self.sub_filters.append(f"scale2ref={width}:{height}")
-        return self
-
-    def overlay(self, width="(main_w-overlay_w)/2", height="(main_h-overlay_h)/2"):
-        self.sub_filters.append(f"overlay={width}:{height}")
-        return self
-
-    def color_channel_mixer(self, alpha=0.3):
-        self.sub_filters.append(f"colorchannelmixer=aa={alpha}")
-        return self
-
-    def _setter(self):
-        if self.sub_filters:
-            self.commands.append(",".join(self.sub_filters))
-            self.sub_filters = []
-
-    def link_stream(self, output_stream):
-        self._setter()
-        self.commands.append(f"[{output_stream}]")
-        return self
-
-    def build(self):
-        self._setter()
-        return "".join(self.commands)
-
-    def reset(self):
-        self.commands = []
-        self.sub_filters = []

@@ -4,7 +4,7 @@ from .logging import GuardianLogger
 class Config:
     output_dir: str = "outputs"
     supported_filters: list = ['reverse']
-    log_level: str = 'info'
+    log_level: str = 'debug'
     gif_file_length: int = 10
 
     @classmethod
