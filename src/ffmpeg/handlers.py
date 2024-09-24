@@ -7,6 +7,7 @@ class BaseFFMPEG:
         self.cmd = ['ffmpeg']
         self.file_path = FileHandler().validate(file_path)
         self.file_name, self.file_extension = os.path.splitext(os.path.basename(self.file_path))
+        self.metadata: dict = {}
 
     def _reset(self):
         self.cmd = ["ffmpeg"]

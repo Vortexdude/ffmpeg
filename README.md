@@ -29,59 +29,64 @@ To use this module, make sure you have Python 3.12 and FFmpeg installed.
    from ffmpeg import FFMPEG
    
    file = "sample.mp4"
-   ss = FFMPEG(input_stream=file)
+   app = FFMPEG(input_stream=file)
    ```
 
 2. Splitting Chapters <br> If the video contains chapters metadata, you can split the video into separate files for each chapter.
    ``` python
-   from ffmpeg import FFMPEG
-   
-   file = "sample.mp4"
-   ss = FFMPEG(input_stream=file)
-   chapters = ss.metadata.get('chapters')
-   ss.split(chapters)
+   chapters = app.metadata.get('chapters')
+   app.split(chapters)
    ```
 3. Remove Audio from Video <br> Remove audio tracks from a video file:
 
    ``` python
-   ss.remove_audio()
+   app.remove_audio()
    ```
 4. Take a screenshot <br> Capture a screenshot at a specific time in the video:
 
    ``` python
-   ss.take_screenshot(time="00:00:05")
+   app.take_screenshot(time="00:00:05")
    ```
 5. Convert Streaming Video to MP4 <br> You can convert a stream URL (e.g., .m3u8) to MP4:
 
     ``` python
     file = "https://v1.pinimg.com/videos/iht/hls/af/e6/a0/afe6a04e775f492fbb58b6fbf7e21eef.m3u8"
-    ss = FFMPEG(input_stream=file)
-    ss.convert_to_mp4(output="output.mp4")
+    app = FFMPEG(input_stream=file)
+    app.convert_to_mp4(output="output.mp4")
     ```
 
 6. Extract Audio Streams <br> Extract audio streams from a video:
 
     ``` python
-    audio_stream = ss.audio_streams
+    audio_stream = app.audio_streams
     for stream in audio_stream:
         if stream['name'] == "hin":  # Example: Hindi audio track
-            ss.extract_audio(stream)
+            app.extract_audio(stream)
     ```
 
 7. Reverse Video <br> Reverse the video with or without audio:
 
     ``` python
-    ss.reverse_video(include_audio=False)
+    app.reverse_video(include_audio=False)
     ```
 
 8. Convert to GIF <br> Convert a portion of the video to a GIF:
 
     ``` python
-    ss.convert_to_gif(start_time="00:00:10", duration=5)
+    app.convert_to_gif(start_time="00:00:10", duration=5)
     ```
 
 9. Resize/Scale Video <br> Resize the video to specific dimensions:
 
     ``` python
-    ss.scale("480x240")
+    app.scale("480x240")
     ```
+
+10. Add Watermark in the video
+
+    ``` python
+    watermark_file = 'thumb.png'
+    app.add_watermark(watermark_file, position="top_righ", padding=20)
+    ```
+
+> for know about more about the method please check out the full documentation.

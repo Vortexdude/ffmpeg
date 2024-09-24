@@ -1,9 +1,12 @@
 from .config import logger
+from .constant import Flags
 from ffmpeg.exceptions import errors
 
 __all__ = ["CMDJoiner"]
 
 SUPPORTED_FILTERS = ['reverse', "scale"]
+VIDEO_EXTENSIONS = ['.webm', '.mkv', '.flv', '.ogv', '.mov', '.avi', '.mp4', '.m4v', '.mpg', '.mpeg', '.m4v', '.3gp']
+IMAGE_EXTENSIONS = ['.jpg', '.jpeg', ".png", "webm", ".gif", ".svg", "webp"]
 
 
 class BaseClass:
@@ -22,19 +25,23 @@ class BaseClass:
 
 class Constant(BaseClass):
 
-
     def FORCEFULLY(self):
         self.cmd.append("-y")
         return self
 
     @property
     def DISPLAY_STREAM(self):
-        self.cmd.append("-show_streams")
+        self.cmd.append(Flags.STREAM)
+        return self
+
+    @property
+    def DISPLAY_FORMAT(self):
+        self.cmd.append(Flags.FORMAT)
         return self
 
     @property
     def DISPLAY_CHAPTERS(self):
-        self.cmd.append("-show_chapters")
+        self.cmd.append(Flags.CHAPTERS)
         return self
 
     @property
@@ -69,6 +76,13 @@ class Filters(BaseClass):
         self.cmd.extend(['-vf', filter_string])
         return self
 
+    # https://superuser.com/questions/1331752/ffmpeg-adding-metadata-to-an-mp3-from-mp3-input
+
+    def metadata(self, **kwargs):
+        for key, value in kwargs.items():
+            self.cmd.extend(["-metadata", f"{key}={value}"])
+        return self
+
     def video_filter(self, value):
         if value not in SUPPORTED_FILTERS:
             if 'scale' in value:
@@ -77,7 +91,7 @@ class Filters(BaseClass):
 
             raise NotImplementedError
 
-        self.cmd.extend(["-filter:v", value]) # or "-vf" is the same
+        self.cmd.extend(["-filter:v", value])  # or "-vf" is the same
         return self
 
     def audio_filter(self, value):
@@ -89,6 +103,21 @@ class Filters(BaseClass):
 
     def audio_bitstream(self, value):
         self.cmd.extend(["-bsf:a", value])
+        return self
+
+    def FILTER_COMPLEX(self, filter_string):
+        """Validating the command and append the keyword with string"""
+
+        if self.cmd[1] not in self.cmd[2:]:  # check the -i or input appears multiple times
+            raise ValueError("For filter complex need to have multiple input files")
+
+        total_inputs = [self.cmd[inx + 1] for inx, item in enumerate(self.cmd) if item == "-i"]
+
+        if len(total_inputs) < 2:
+            raise ValueError("at least two input should be provided")
+
+        self.cmd.extend(["-filter_complex", filter_string])
+
         return self
 
 
@@ -151,7 +180,6 @@ class CMDJoiner(Constant, Codecs, Filters):
     def map(self, value):
         self.cmd.extend(["-map", str(value)])
         return self
-
 
     def threads(self, value):
         self.cmd.extend(["-threads", str(value)])
