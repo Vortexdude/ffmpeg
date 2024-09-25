@@ -272,20 +272,17 @@ class FFMPEG(Metadata, ChapterMixing, VideoProcess, AudioProcessing):
         _file_extension = '.gif'
         video_duration = self.metadata.get('duration')
 
-        if fps is None:
-            fps = 10 # ideal for compact size
+        kwargs = {
+            'force_replace': force_replace or False,
+            'output_file': output_file or f"{self.file_name}_image{_file_extension}",
+        }
 
-        if width is None:
-            width = 320 # ideal width
-
-        if output_file is None:
-            output_file = f"{self.file_name}_image{_file_extension}"
-
+        _filter_args = {
+            'fps': fps or 10,
+            'scale': f'{width or 320}:-1:flags=lanczos'
+        }
         _seek, _end = validate_time_range(video_duration, seek=seek, end=end, max_length=Config.gif_file_length)
-
-        _filter = {'fps': str(fps), 'scale': f'{str(width)}:-1:flags=lanczos'}
-
-        super().convert_to_gif(seek=seek, end=end, filter_string=_filter, output_file=output_file, force_replace=force_replace)
+        super().convert_to_gif(seek=_seek, end=_end, filter_string=_filter_args, **kwargs)
 
     def add_watermark(self,
                       watermark_file, *,
@@ -343,6 +340,7 @@ class FFMPEG(Metadata, ChapterMixing, VideoProcess, AudioProcessing):
         :return:
         :rtype:
         """
+
         # setting default args
         kwargs = {
             'position': position or 'top_left',

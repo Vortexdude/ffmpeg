@@ -50,7 +50,7 @@ def runner(force=False):
                     logger.warning(f"File '{output_file}' already exists overwriting the file")
 
             output = sp.run(self.cmd, stdout=sp.PIPE, stderr=sp.STDOUT, shell=False)
-            # print(output.stdout.decode('utf-8'))
+            print(output.stdout.decode('utf-8'))
             self._reset()
 
         return wrapper

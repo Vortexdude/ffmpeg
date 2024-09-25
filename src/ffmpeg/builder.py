@@ -84,13 +84,6 @@ class Filters(BaseClass):
         return self
 
     def video_filter(self, value):
-        if value not in SUPPORTED_FILTERS:
-            if 'scale' in value:
-                self.cmd.extend(["-filter:v", value])  # or "-vf" is the same
-                return self
-
-            raise NotImplementedError
-
         self.cmd.extend(["-filter:v", value])  # or "-vf" is the same
         return self
 
