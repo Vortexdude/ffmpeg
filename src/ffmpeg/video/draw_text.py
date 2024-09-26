@@ -34,29 +34,34 @@ class FFmPegDrawText:
         self.commands.append(f"duration={value}")
 
     def position(self, pos, padding):
-        if pos == 'top_right':
-            x = "(w-text_w)"
-            y = "0"
+        if isinstance(pos, str):
+            if pos == 'top_right':
+                x = "(w-text_w)"
+                y = "0"
 
-        elif pos == 'bottom_left':
-            x = "0"
-            y = "(h-text_h)"
+            elif pos == 'bottom_left':
+                x = "0"
+                y = "(h-text_h)"
 
-        elif pos == 'bottom_right':
-            x = "(w-text_w)"
-            y = "(h-text_h)"
+            elif pos == 'bottom_right':
+                x = "(w-text_w)"
+                y = "(h-text_h)"
 
-        elif pos == 'centre':
-            x = "(w-text_w)/2"
-            y = "(h-text_h)/2"
+            elif pos == 'centre':
+                x = "(w-text_w)/2"
+                y = "(h-text_h)/2"
 
+            else:
+                # resetting coordinates for top left
+                x = "0"
+                y = "0"
         else:
-            # resetting coordinates for top left
-            x = "0"
-            y = "0"
+            x = pos[0]
+            y = pos[1]
 
-        x = f"{x}-{padding}" if x != "0" else f"{padding}"
-        y = f"{y}-{padding}" if y != "0" else f"{padding}"
+        if padding:
+            x = f"{x}-{padding}" if x != "0" else f"{padding}"
+            y = f"{y}-{padding}" if y != "0" else f"{padding}"
 
         self.commands.append(f"x={x}:y={y}")
         return self
@@ -84,7 +89,20 @@ class FFmPegDrawText:
     def flux(self):
         return "drawtext=" + ":".join(self.commands)
 
-def generate_filter_string(text, font_file, font_color=None, font_size=None, position=None, padding=None, enable_box=None, box_color=None, border_width=None, transparency=None, start_after=None, repeat=None, duration=None):
+def generate_filter_string(text,
+                           font_file,
+                           font_color=None,
+                           font_size=None,
+                           position=None,
+                           padding=None,
+                           enable_box=None,
+                           box_color=None,
+                           border_width=None,
+                           transparency=None,
+                           start_after=None,
+                           repeat=None,
+                           duration=None):
+
     tObj = FFmPegDrawText()
     tObj.font_file(font_file).text(text).font_color(font_color).font_size(font_size)
 

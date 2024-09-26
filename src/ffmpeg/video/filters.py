@@ -94,47 +94,28 @@ class VideoProcess(BaseFFMPEG):
         _sequence.INPUT(self.file_path).INPUT(watermark_file).FILTER_COMPLEX(filter_string).OUTPUT_FILE(output_file)
         self.cmd = _sequence.build()
 
-    @runner(force=True)
+    @runner(force=False)
     def add_text(self,
                  text,
-                 font_file=None,
-                 font_color=None,
-                 font_size=None,
                  position=None,
-                 enable_box=None,
-                 box_color=None,
-                 border_width=None,
-                 transparency=None,
                  padding=None,
                  force_replace=None,
-                 repeat=None,
-                 start_after=None,
-                 duration=None
-    ):
+                 **kwargs):
+
         logger.info(f"Adding the text '{text}' to the video '{self.file_name}'.")
         _sequence = CMDJoiner(["ffmpeg"])
 
         if force_replace:
             _sequence.FORCEFULLY()
 
-        kwargs = {
-            'font_file': font_file or 'roboto.ttf',
-            'font_color': font_color or 'white',
-            'font_size': font_size or 24,
-            'position': position or 'centre',
-            'enable_box': enable_box or True,
-            'box_color': box_color or 'black',
-            'transparency': transparency or 0.5,
-            'border_width': border_width or 5,
-            'padding': padding or 30,
-            'start_after': start_after,
-            'duration': duration,
-            'repeat': repeat
-        }
-
         output_file = f"{self.file_name}_edited{self.file_extension}"
 
-        _filter_string = draw_text.generate_filter_string(text=text, **kwargs)
+        _filter_string = draw_text.generate_filter_string(
+            text=text,
+            position=position,
+            padding=padding,
+            **kwargs
+        )
 
         _sequence.INPUT(self.file_path).video_filter(_filter_string).audio_codec('copy').OUTPUT_FILE(output_file)
         self.cmd = _sequence.build()

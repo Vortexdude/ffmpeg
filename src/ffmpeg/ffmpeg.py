@@ -230,7 +230,6 @@ class FFMPEG(Metadata, ChapterMixing, VideoProcess, AudioProcessing):
                        fps: int = None,
                        width: int = None,
                        force_replace: bool = False):
-
         """
         Converts a portion of the video to a GIF.
         Parameters:
@@ -352,3 +351,78 @@ class FFMPEG(Metadata, ChapterMixing, VideoProcess, AudioProcessing):
             output_file = f"{self.file_name}_mixed_{self.file_extension}"
 
         super().add_watermark(watermark_file, output_file=output_file, force_replace=force_replace, **kwargs)
+
+    def add_text(self,
+                 text,
+                 font_file=None,
+                 font_color=None,
+                 font_size=None,
+                 position=None,
+                 enable_box=None,
+                 box_color=None,
+                 border_width=None,
+                 transparency=None,
+                 padding=None,
+                 force_replace=None,
+                 repeat=None,
+                 start_after=None,
+                 duration=None):
+
+        """
+        Adds a text overlay to a media file (e.g., video or image) with customizable options for font, positioning,
+        style, and timing.
+        :param text:
+        :type text:
+        :param font_file:
+        :type font_file:
+        :param font_color:
+        :type font_color:
+        :param font_size:
+        :type font_size:
+        :param position:
+        :type position:
+        :param enable_box:
+        :type enable_box:
+        :param box_color:
+        :type box_color:
+        :param border_width:
+        :type border_width:
+        :param transparency:
+        :type transparency:
+        :param padding:
+        :type padding:
+        :param force_replace:
+        :type force_replace:
+        :param repeat:
+        :type repeat:
+        :param start_after:
+        :type start_after:
+        :param duration:
+        :type duration:
+        :return:
+        :rtype:
+        """
+
+        if not position:
+            position = 'top_right'
+
+        if isinstance(position, str):
+            padding = padding or 30
+
+        elif isinstance(position, tuple):
+            padding = None
+
+        kwargs = {
+            'font_file': font_file or 'roboto.ttf',
+            'font_color': font_color or 'white',
+            'font_size': font_size or 24,
+            'enable_box': enable_box or True,
+            'box_color': box_color or 'black',
+            'transparency': transparency or 0.5,
+            'border_width': border_width or 5,
+            'start_after': start_after,
+            'duration': duration,
+            'repeat': repeat
+        }
+
+        super().add_text(text, position=position, padding=padding, force_replace=force_replace, **kwargs)

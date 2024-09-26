@@ -11,6 +11,9 @@ watermark_file = "watermark.jpeg"
 # file = "tanjiro.jpeg"
 # file = "https://v1.pinimg.com/videos/mc/hls/8f/b1/d6/8fb1d693ed2890d1eb45fef1127f3fd0.m3u8"
 
+#TODO check the file type like its audio or video without using the extension and then fetch the metadata
+#TODO Audio_processing for manipulate the metadata of the audio file
+
 app = FFMPEG(input_stream=file)
 # app.add_metadata(genre="hiphop", album="Encore", artist="Nitin")
 # print(app.metadata.get('format').get('tags'))
