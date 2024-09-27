@@ -3,7 +3,6 @@ from .constant import Flags
 from ffmpeg.exceptions import errors
 
 __all__ = ["CMDJoiner"]
-
 SUPPORTED_FILTERS = ['reverse', "scale"]
 VIDEO_EXTENSIONS = ['.webm', '.mkv', '.flv', '.ogv', '.mov', '.avi', '.mp4', '.m4v', '.mpg', '.mpeg', '.m4v', '.3gp']
 IMAGE_EXTENSIONS = ['.jpg', '.jpeg', ".png", "webm", ".gif", ".svg", "webp"]
@@ -15,7 +14,7 @@ class BaseClass:
 
     @property
     def cmd(self):
-        logger.debug(f"Building the command -  {" ".join(self._cmd)}")
+        # logger.debug(f"Building the command -  {" ".join(self.cmd)}")
         return self._cmd
 
     @cmd.setter
@@ -30,17 +29,17 @@ class Constant(BaseClass):
         return self
 
     @property
-    def DISPLAY_STREAM(self):
+    def SHOW_STREAM(self):
         self.cmd.append(Flags.STREAM)
         return self
 
     @property
-    def DISPLAY_FORMAT(self):
+    def SHOW_FORMAT(self):
         self.cmd.append(Flags.FORMAT)
         return self
 
     @property
-    def DISPLAY_CHAPTERS(self):
+    def SHOW_CHAPTERS(self):
         self.cmd.append(Flags.CHAPTERS)
         return self
 
@@ -69,6 +68,10 @@ class Codecs(BaseClass):
         self.cmd.extend(["-c", "copy"])
         return self
 
+    @property
+    def MAP_METADATA(self):
+        self.cmd.extend(["-map_metadata", "1"])
+        return self
 
 class Filters(BaseClass):
     def add_filter(self, filters):
@@ -117,11 +120,11 @@ class Filters(BaseClass):
 class CMDJoiner(Constant, Codecs, Filters):
 
     def INPUT(self, file):
-        self.cmd.extend(["-i", file])
+        self.cmd.extend(["-i", str(file)])
         return self
 
     def OUTPUT_FILE(self, file):
-        self.cmd.append(file)
+        self.cmd.append(str(file))
         return self
 
     def log_level(self, value):

@@ -26,6 +26,13 @@ class BaseProcess:
         return url
 
     def run(self, output_file=None) -> str:
+        """
+        Download the video file and returns the file name that is generated dynamically
+        :param output_file:
+        :type output_file:
+        :return:
+        :rtype:
+        """
         if not output_file:
             output_file = f"{id_generator()}.mp4"
 

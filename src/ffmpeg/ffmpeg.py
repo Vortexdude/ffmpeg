@@ -1,7 +1,7 @@
 from .config import Config
 from .metadata import Metadata
 from .base_process import parser
-from .chapter import ChapterMixing
+from ffmpeg.video.chapter import ChapterMixing
 from ffmpeg.video.filters import VideoProcess
 from ffmpeg.audio.filters import AudioProcessing
 from .helpers import TConverter, validate_time_string, FFMpegHelper, validate_time_range
@@ -235,23 +235,27 @@ class FFMPEG(Metadata, ChapterMixing, VideoProcess, AudioProcessing):
         Parameters:
         ----------
         output_file : str, optional
-            The file path where the GIF will be saved. If not provided, a default file name will be generated based on the original video file name.
+            The file path where the GIF will be saved. If not provided, a default file name will be generated based on
+            the original video file name.
 
         seek : str, optional
-            The timestamp in "HH:MM:SS" format from which to start the GIF. If not provided, the GIF starts from the beginning.
+            The timestamp in "HH:MM:SS" format from which to start the GIF. If not provided, the GIF starts from the
+            beginning.
 
         end : str, optional
-            The timestamp in "HH:MM:SS" format to stop the GIF. If not provided, the GIF will capture a default duration after the seek time.
+            The timestamp in "HH:MM:SS" format to stop the GIF. If not provided, the GIF will capture a default
+            duration after the seek time.
 
         fps : int, optional
             The frames per second for the GIF. If not provided, a default FPS value is used.
 
         width : int, optional
-            The width of the output GIF. If provided, the height will be scaled proportionally to maintain the aspect ratio.
+            The width of the output GIF. If provided, the height will be scaled proportionally to maintain the aspect
+            ratio.
 
         force_replace : bool, optional, default: False
-            If True, it will overwrite the output file if it already exists. If False and the file exists, the function may raise an error or generate a new file name.
-
+            If True, it will overwrite the output file if it already exists. If False and the file exists, the function
+             may raise an error or generate a new file name.
 
         :param output_file:
         :type output_file:
@@ -304,22 +308,26 @@ class FFMPEG(Metadata, ChapterMixing, VideoProcess, AudioProcessing):
             If None, the default position is the top-left corner of the video.
 
         padding : int or tuple, optional
-            Padding around the watermark. Can be a single integer for uniform padding or a tuple for (horizontal, vertical) padding.
+            Padding around the watermark. Can be a single integer for uniform padding or a tuple for (horizontal,
+            vertical) padding.
             Default is None (no padding).
 
         scale_factor : float, optional
-            Factor to scale the watermark relative to its original size. A value less than 1 will reduce the size, and greater than 1 will increase it.
+            Factor to scale the watermark relative to its original size. A value less than 1 will reduce the size, and
+            greater than 1 will increase it.
             Default is None (original size is used).
 
         output_file : str, optional
             Path to the output video file. If None, a default output file will be generated based on the input filename.
 
         force_replace : bool, optional
-            If True, overwrite the existing output file if it exists. If False, an error will be raised if the output file already exists.
+            If True, overwrite the existing output file if it exists. If False, an error will be raised if the output
+             file already exists.
             Default is False.
 
         transparency : float, optional
-            The transparency level for the watermark (between 0 and 1). A value of 0 means fully transparent (invisible), and 1 means fully opaque.
+            The transparency level for the watermark (between 0 and 1). A value of 0 means fully transparent
+            (invisible), and 1 means fully opaque.
             Default is None (no transparency adjustment is made).
 
         :param watermark_file:
