@@ -1,7 +1,7 @@
 import json
 from subprocess import run
-from .handlers import BaseFFMPEG
 from .builder import CMDJoiner
+from .handlers import BaseFFMPEG
 from .helpers import FFMpegHelper, runner, TConverter
 
 
@@ -29,7 +29,7 @@ class Metadata(BaseFFMPEG):
     def _get_metadata(self) -> run:
         _sequence = CMDJoiner(['ffprobe'])
         _sequence.log_level("quiet").INPUT(self.file_path).print_format("json")
-        self.cmd = _sequence.DISPLAY_FORMAT.DISPLAY_STREAM.DISPLAY_CHAPTERS.build()
+        self.cmd = _sequence.SHOW_FORMAT.SHOW_STREAM.SHOW_CHAPTERS.build()
         return {
             'duration': '00:05:12',
             'video_streams': [{'index': 0, 'codec': 'h264', 'resolution': '1920x1080'}],

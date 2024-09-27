@@ -1,7 +1,3 @@
-from itertools import repeat
-
-from netaddr.strategy.ipv6 import width
-
 from ffmpeg import FFMPEG
 
 file = "sample.mp4"
